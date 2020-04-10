@@ -1,4 +1,5 @@
-%% Measuring the Lyapunov exponent involves taking the slope of the line of
+%% Lyapunov Exponent Plotter
+%  Measuring the Lyapunov exponent involves taking the slope of the line of
 %  best fit of a suitable set of linear datapoints near the beginning of
 %  the plot. However, the system is extremely sensitive to the initial 
 %  conditions and so the exact location of this set of datapoints varied 
@@ -80,7 +81,8 @@ LyapunovExponents = ...
 % exponents are therefore all normalised against the minimum value.
 NormVal = min(LyapunovExponents);
 figure(1)
-plot(Theta(1:54),smooth(LyapunovExponents(1:54)/NormVal));
+plot(Theta,smooth(LyapunovExponents/NormVal));
 xlabel('\theta');
 ylabel('\lambda');
-savefig(figure(1),'Lyapunov Exponent vs Theta(Partial).fig')
+savefig(figure(1),'Normalised Lyapunov Exponent vs Theta(Entire).fig')
+
