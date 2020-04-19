@@ -1,29 +1,26 @@
 function [DEuler]=EqOfMotionModel()
       clear all
       m=1;  %Disk mass (g)
-      g=9.8;	%Gravitation constant (m/s/s)
-      a=1.0;	%Disk radius (m)
-      h=2;	%Disk height (mm)
-      C=[0.03, 0.073,0.185]';   %Drag co-efficients
+      g=9.8;      %Gravitation constant (m/s/s)
+      a=1.0;  %Disk radius (m)
+      h=2;    %Disk height (mm)
+      C=[1, 1,0.185]';
       [I,J,rG]=CreateConstantMatrices(m,g,h,a);
       IntegrationTimes=0:0.0001:10;
       
-      %Pairs of slightly different sets of initial values for the Euler 
-      %angles and their derivatives, the angular momentum vectors and the 
-      %position co-ordinates.
       Euler0=deg2rad([89;0;0]);
       Euler1=deg2rad([88.999;0;0]);
-      DEuler0=[0;6.5;6.5];
-      DEuler1=[0;6.5;6.5];
+      DEuler0=[0;0;80];
+      DEuler1=[0;0;80];
       DE2o=@(theta)[1,0,0;0,1,sin(theta);0,0,cos(theta)];
       omega0=DE2o(Euler0(1))*DEuler0;
       omega1=DE2o(Euler1(1))*DEuler1;
       position0=[0;0;a*sin(Euler0(1))+(h/2)*cos(Euler0(1))];
-      position1=[cos(Euler1(3))*(a*cos(Euler1(1))-a*cos(Euler0(1)));...
-          sin(Euler1(3))*(a*cos(Euler1(1))-a*cos(Euler0(1)));...
+      position1=[cos(Euler1(3))*(cos(Euler1(1))-cos(Euler0(1)));...
+          sin(Euler1(3))*(cos(Euler1(1))-cos(Euler0(1)));...
           a*sin(Euler1(1))+(h/2)*cos(Euler1(1))];
       
-      %ODE45 Method using each set of initial conditions.
+      %ODE45 Method
       opts=odeset('RelTol',1e-4,'AbsTol',1e-5,'MaxStep',1e-1,...
           'InitialStep',1e-10,'Events',@(t,x)FallingEventFcn(t,x,a,h));
       [t,x]=ode45(@(t,x)func(t,x,I,J,rG,g,m,h,C),IntegrationTimes,...
@@ -36,8 +33,8 @@ function [DEuler]=EqOfMotionModel()
       plot(x(:,1),x(:,2))
       xlabel('x');
       ylabel('y');
-      zlabel('z');
-      saveas(figure(1),'CentreOfMassMotion(89,0,0,0,6.5,6.5).png')
+      %zlabel('z');
+      savefig(figure(1),'CentreOfMassMotion(1,1,0.185).fig')
       
       %Omega vector
       figure(2)
@@ -45,27 +42,27 @@ function [DEuler]=EqOfMotionModel()
       xlabel('\omega_1');
       ylabel('\omega_2');
       zlabel('\omega_3');
-      saveas(figure(2),'AngularMomentumVector(89,0,0,0,6.5,6.5).png')
+      savefig(figure(2),'AngularVelocityVector(1,1,0.185).fig')
       
       %Theta vs Time
       figure(3)
       plot(t,x(:,4)./pi)
       xlabel('Time, t');
       ylabel('\theta/\pi');
-      saveas(figure(3),'Theta(89,0,0,0,6.5,6.5).png')
+      savefig(figure(3),'Theta(1,1,0.185).fig')
       
-      %Lyapunov exponent plotter
-      LyapunovDiff=sqrt((x(:,1)-x2(:,1)).^2+(x(:,2)-x2(:,2)).^2+(x(:,3)-...
-          x2(:,3)).^2);
-      figure(4)
-      plot(IntegrationTimes,log(LyapunovDiff))
-      P = polyfit(IntegrationTimes,log(LyapunovDiff'),1);
-      LyapunovExponent = P(1);
-      LogInitialSeparation = log(LyapunovDiff(1));
-      YIntercept = P(2);
-      xlabel('Time, t');
-      ylabel('ln(d_t)');
-      savefig(figure(4),'Lyapunov(50v0.001,0,0,0,0,80).fig')
+%       %Lyapunov exponent plotter
+%       LyapunovDiff=sqrt((x(:,1)-x2(:,1)).^2+(x(:,2)-x2(:,2)).^2+(x(:,3)-...
+%           x2(:,3)).^2);
+%       figure(4)
+%       plot(IntegrationTimes,log(LyapunovDiff))
+%       P = polyfit(IntegrationTimes(74:187),log(LyapunovDiff(74:187)'),1);
+%       LyapunovExponent = P(1)
+%       LogInitialSeparation = log(LyapunovDiff(1))
+%       YIntercept = P(2)
+%       xlabel('Time, t');
+%       ylabel('ln(d_t)');
+%       saveas(figure(4),'Lyapunov(65v0.001,0,0,0,0,80).png')
 end
 
 function [I,J,rG]=CreateConstantMatrices(m,g,h,a)
