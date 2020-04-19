@@ -14,3 +14,7 @@ respectively, the initial values of Theta, Psi, Phi,
 dTheta/dt, dPsi/dt and dPhi/dt (separated by commas). The 
 'v0.001' indicates which of these initial angles was varied 
 slightly and by how much (generally they were varied by 0.001).
+
+In the images saved under "Drag Coefficients" the naming 
+convention is of the form (C_x, C_y, C_z) for example 
+(0.1,0.1,0.1)
